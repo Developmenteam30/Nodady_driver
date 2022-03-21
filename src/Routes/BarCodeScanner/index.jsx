@@ -7,15 +7,60 @@ import InputWithLabel from '../../Components/Shared/InputWithLabel';
 import Button from '../../Components/Shared/Button';
 import Constants from '../../Variables/colors.variables';
 import Styles from './BarCodeScanner.styles';
+import { useContext } from 'react';
+import { NotificationContext } from '../../Context/Notification.context';
+import { AppContext } from '../../Context/App.context';
+import { API_DOMAIN } from '../../Variables/globals.variables';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigate } from 'react-router-native';
 
 const ScanScreen = () => {
+  const notification = useContext(NotificationContext);
+  const session = useContext(AppContext);
+  const navigate = useNavigate();
   const [awbNumber, setAwbNumber] = useState(undefined);
 
   const onSuccess = e => {
-    setAwbNumber(e.data);
+    navigate(`/order/${e.data}`);
   };
 
-  const handleSubmit = () => {};
+  const getOrderId = async id => {
+    session.setIsLoading(true);
+    const token = await AsyncStorage.getItem('authData');
+    try {
+      const res = await axios.get(
+        `${API_DOMAIN}/api/v1/get-order-id?order_id=${awbNumber}`,
+        {
+          headers: {
+            authorization: `Bearer ${JSON.parse(token).token}`,
+          },
+        },
+      );
+      if (res?.data) {
+        navigate(`/order/${res.data.order_id}`);
+        session.setIsLoading(false);
+      }
+    } catch (error) {
+      session.setIsLoading(false);
+      if (error.response) {
+        let firstError =
+          Object.values(error.response.data) &&
+          Object.values(error.response.data)[0] &&
+          Object.values(error.response.data)[0][0];
+        if (firstError) {
+          return notification.setNotificationObject({
+            type: 'error',
+            message: firstError,
+          });
+        }
+      }
+      return notification.setNotificationObject({
+        type: 'error',
+        message: error,
+      });
+    }
+  };
 
   return (
     <>
@@ -34,14 +79,13 @@ const ScanScreen = () => {
           />
           <View style={Styles.inputSection}>
             <InputWithLabel
-              label={'Generate Manifest for AWB'}
+              label={'Generate Details for Order Id'}
               onChange={setAwbNumber}
               value={awbNumber}
-              disabled={false}
             />
             <View style={Styles.buttonSection}>
               <Button
-                onPress={() => handleSubmit()}
+                onPress={() => getOrderId()}
                 text={'Proceed'}
                 backgroundColor={awbNumber ? Constants.primaryColor : '#b4b4b4'}
                 color={'white'}

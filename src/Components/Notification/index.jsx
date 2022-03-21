@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { Image, View, Text, TouchableOpacity } from 'react-native';
 import Styles from './Notification.styles';
-import NotifIcon from '../../Assets/Images/successNotif.png';
-import CloseIcon from '../../Assets/Images/cross.png';
+import NotifIcon from '../../Assets/Images/infoIcon.png';
+import CloseIcon from '../../Assets/Images/whitecross.png';
 
 export default props => {
   const handleClose = () => {
@@ -40,7 +40,7 @@ export default props => {
         {props.notificationObject.message}
       </Text>
       <TouchableOpacity style={Styles.closeBtn} onPress={() => handleClose()}>
-        <Image source={CloseIcon} />
+        <Image source={CloseIcon} style={{ width: 12, height: 12 }} />
       </TouchableOpacity>
     </View>
   );

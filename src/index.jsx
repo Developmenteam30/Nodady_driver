@@ -26,12 +26,8 @@ const Main = () => {
                 element={<NavigationRoutes.Statistics />}
               />
               <Route
-                path="/delivery/:id/order/:orderId"
+                path="/order/:id"
                 element={<NavigationRoutes.SpecificDelivery />}
-              />
-              <Route
-                path="/pickup/:id/order/:orderId"
-                element={<NavigationRoutes.SpecificPickup />}
               />
               <Route
                 exact

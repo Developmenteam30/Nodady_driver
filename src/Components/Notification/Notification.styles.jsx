@@ -24,7 +24,7 @@ const Styles = StyleSheet.create({
   },
   notifMessage: {
     paddingVertical: 8,
-    color: Constants.headingColor,
+    color: 'white',
     fontFamily: 'Poppins-Medium',
     marginRight: 12,
     flex: 1,

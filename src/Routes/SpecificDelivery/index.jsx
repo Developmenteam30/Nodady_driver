@@ -112,7 +112,9 @@ const SpecificDelivery = () => {
   return (
     <>
       <StatusBar backgroundColor="white" barStyle="dark-content" />
-      <BreadCrumbs title={`Order ID: #${params.orderId}`} />
+      <BreadCrumbs
+        title={`Order ID: #${session.forwardOrderDetails.order_id}`}
+      />
       <ScrollView keyboardShouldPersistTaps="handled">
         <View style={Styles.container}>
           <View style={Styles.cardSection}>

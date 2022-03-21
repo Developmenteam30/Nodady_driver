@@ -86,7 +86,7 @@ const Delivery = () => {
                 key={i}
                 style={Styles.card}
                 onPress={() => {
-                  navigate(`/delivery/${obj.id}/order/${obj.order_id}`);
+                  navigate(`/order/${obj.id}`);
                 }}>
                 <Text style={Styles.name}>{obj.business_owner}</Text>
                 <Text style={Styles.orderId}>Order Id</Text>

@@ -10,6 +10,7 @@ const Dashboard = () => {
   const session = useContext(AppContext);
 
   useEffect(() => {
+    session.isCurrentHomePage.current = true;
     return () => {
       if (session.isCurrentHomePage.current) {
         session.isCurrentHomePage.current = false;

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import {
   Text,
   View,
@@ -24,6 +24,17 @@ const SignIn = () => {
   const navigate = useNavigate();
   const session = useContext(AppContext);
   const [password, setPassword] = useState(undefined);
+
+  useEffect(() => {
+    if (!session.isCurrentHomePage.current) {
+      session.isCurrentHomePage.current = true;
+    }
+    return () => {
+      if (session.isCurrentHomePage.current) {
+        session.isCurrentHomePage.current = false;
+      }
+    };
+  }, []);
 
   const handleSubmit = async () => {
     if (!password) {

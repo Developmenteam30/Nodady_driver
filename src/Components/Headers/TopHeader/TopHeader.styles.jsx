@@ -4,7 +4,7 @@ import Constants from '../../../Variables/colors.variables';
 const Styles = StyleSheet.create({
   headerSection: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     height: 90,
     alignItems: 'center',
     backgroundColor: Constants.primaryColor,

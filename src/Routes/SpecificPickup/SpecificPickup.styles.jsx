@@ -12,14 +12,15 @@ const Styles = StyleSheet.create({
     padding: 24,
     width: '100%',
   },
-  allButtonSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
   editButtonSection: {
-    width: '60%',
-    paddingHorizontal: 24,
-    paddingBottom: 24,
+    width: '50%',
+    paddingHorizontal: 6,
+    paddingBottom: 12,
+  },
+  allButtonSection: {
+    flexShrink: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
   cardSection: {
     paddingHorizontal: 24,

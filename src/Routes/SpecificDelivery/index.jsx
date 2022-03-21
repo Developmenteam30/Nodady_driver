@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, View, Image, ScrollView, StatusBar } from 'react-native';
 import BreadCrumbs from '../../Components/Shared/BreadCrumbs';
 import Styles from './SpecificDelivery.styles';
@@ -20,6 +20,7 @@ const SpecificDelivery = () => {
   const session = useContext(AppContext);
   const notification = useContext(NotificationContext);
   const navigate = useNavigate();
+  const [buttons, setButtons] = useState([]);
 
   useEffect(() => {
     getPickups();
@@ -38,9 +39,54 @@ const SpecificDelivery = () => {
         },
       );
       if (res?.data) {
-        console.log(res.data.detail);
+        setButtons(res.data.detail.button);
         session.setForwardOrderDetails(res.data.detail);
         session.setIsLoading(false);
+      }
+    } catch (error) {
+      session.setIsLoading(false);
+      if (error.response) {
+        let firstError =
+          Object.values(error.response.data) &&
+          Object.values(error.response.data)[0] &&
+          Object.values(error.response.data)[0][0];
+        if (firstError) {
+          return notification.setNotificationObject({
+            type: 'error',
+            message: firstError,
+          });
+        }
+      }
+      return notification.setNotificationObject({
+        type: 'error',
+        message: error,
+      });
+    }
+  };
+
+  const handleUpdate = async val => {
+    try {
+      session.setIsLoading(true);
+      const token = await AsyncStorage.getItem('authData');
+      const res = await axios.post(
+        `${API_DOMAIN}/api/v1/update-order`,
+        {
+          post_value: val,
+          order_id: params.id,
+        },
+        {
+          headers: {
+            authorization: `Bearer ${JSON.parse(token).token}`,
+          },
+        },
+      );
+      if (res?.data) {
+        getPickups();
+        session.setIsLoading(false);
+        return notification.setNotificationObject({
+          type: 'success',
+          message: 'Status Changed',
+        });
       }
     } catch (error) {
       session.setIsLoading(false);
@@ -244,15 +290,25 @@ const SpecificDelivery = () => {
                 </Text>
               </View>
             </View>
-            <View style={Styles.editButtonSection}>
-              <Button
-                text={'SUBMIT'}
-                onPress={() => {
-                  navigate('/otp-delivery');
-                }}
-                color={'white'}
-                backgroundColor={Constants.primaryColor}
-              />
+            <View style={Styles.allButtonSection}>
+              {buttons.map((obj, i) => {
+                return (
+                  <View key={i} style={Styles.editButtonSection}>
+                    <Button
+                      text={obj.name}
+                      onPress={() => {
+                        handleUpdate(obj.post_value);
+                      }}
+                      color={obj.status ? 'white' : Constants.primaryColor}
+                      backgroundColor={
+                        obj.status ? Constants.primaryColor : 'white'
+                      }
+                      borderColor={Constants.primaryColor}
+                      borderWidth={1}
+                    />
+                  </View>
+                );
+              })}
             </View>
           </View>
         </View>

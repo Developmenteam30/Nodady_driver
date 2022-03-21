@@ -80,6 +80,7 @@ const SpecificPickup = () => {
         },
       );
       if (res?.data) {
+        getPickups();
         session.setIsLoading(false);
         return notification.setNotificationObject({
           type: 'success',
@@ -280,27 +281,7 @@ const SpecificPickup = () => {
               </View>
             </View>
             <View style={Styles.allButtonSection}>
-              {buttons.slice(0, 2).map((obj, i) => {
-                return (
-                  <View key={i} style={Styles.editButtonSection}>
-                    <Button
-                      text={obj.name}
-                      onPress={() => {
-                        handleUpdate(obj.post_value);
-                      }}
-                      color={obj.status ? 'white' : Constants.primaryColor}
-                      backgroundColor={
-                        obj.status ? Constants.primaryColor : 'white'
-                      }
-                      borderColor={Constants.primaryColor}
-                      borderWidth={1}
-                    />
-                  </View>
-                );
-              })}
-            </View>
-            <View style={Styles.allButtonSection}>
-              {buttons.slice(2, 4).map((obj, i) => {
+              {buttons.map((obj, i) => {
                 return (
                   <View key={i} style={Styles.editButtonSection}>
                     <Button

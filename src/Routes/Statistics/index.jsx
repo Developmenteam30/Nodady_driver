@@ -6,6 +6,7 @@ import {
   View,
   TouchableOpacity,
   Text,
+  Dimensions,
 } from 'react-native';
 import Styles from './Statistics.styles';
 import { useContext } from 'react';
@@ -45,7 +46,6 @@ const Statistics = () => {
         session.setIsLoading(false);
       }
     } catch (error) {
-      console.log(error);
       session.setIsLoading(false);
       if (error.response) {
         let firstError =
@@ -76,7 +76,7 @@ const Statistics = () => {
         },
       });
       if (res?.data) {
-        console.log(res.data);
+        setClient(res.data);
         session.setIsLoading(false);
       }
     } catch (error) {
@@ -98,7 +98,7 @@ const Statistics = () => {
         },
       });
       if (res?.data) {
-        console.log(res.data);
+        setCod(res.data);
         session.setIsLoading(false);
       }
     } catch (error) {
@@ -164,6 +164,8 @@ const Statistics = () => {
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
+          minHeight: Dimensions.get('window').height - 150,
+          backgroundColor: 'red',
           flex:
             active === 'GENERAL'
               ? 1
@@ -211,13 +213,12 @@ const Statistics = () => {
                   <View key={ind} style={Styles.codCard}>
                     <View style={Styles.codLeftSection}>
                       <Text style={Styles.codName}>
-                        {obj.name.substring(0, 1)}
+                        {obj.rider_name.substring(0, 1)}
                       </Text>
                     </View>
-
                     <View style={Styles.codRightCard}>
-                      <Text style={Styles.codName}>{obj.name}</Text>
-                      <Text style={Styles.codAmount}>₹ {obj.amount}</Text>
+                      <Text style={Styles.codName}>{obj.rider_name}</Text>
+                      <Text style={Styles.codAmount}>₹ {obj.cod}</Text>
                     </View>
                   </View>
                 );
@@ -231,13 +232,12 @@ const Statistics = () => {
                   <View key={ind} style={Styles.codCard}>
                     <View style={Styles.codLeftSection}>
                       <Text style={Styles.codName}>
-                        {obj.name.substring(0, 1)}
+                        {obj.user_full_name.substring(0, 1)}
                       </Text>
                     </View>
-
                     <View style={Styles.codRightCard}>
-                      <Text style={Styles.codName}>{obj.name}</Text>
-                      <Text style={Styles.codAmount}>₹ {obj.amount}</Text>
+                      <Text style={Styles.codName}>{obj.user_full_name}</Text>
+                      <Text style={Styles.codAmount}>₹ {obj.cod}</Text>
                     </View>
                   </View>
                 );

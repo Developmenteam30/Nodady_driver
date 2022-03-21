@@ -37,7 +37,6 @@ const Delivery = () => {
         },
       });
       if (res?.data) {
-        console.log(res.data.detail);
         setOrders(res.data.detail);
         setAllOrders(res.data.detail);
         session.setIsLoading(false);

@@ -11,6 +11,7 @@ const Styles = StyleSheet.create({
     width: '100%',
     height: 50,
     backgroundColor: Constants.lightColor,
+    color: Constants.headingColor,
   },
   label: {
     color: Constants.activeInputColor,

@@ -21,6 +21,7 @@ const OTP = ({ confirm }) => {
   const { auth } = firebaseSetup();
   const [otp, setOtp] = useState(undefined);
   const [confirmation, setConfirmation] = useState(undefined);
+  const clickedRef = useRef(false);
 
   const confirmApi = async () => {
     try {
@@ -63,7 +64,11 @@ const OTP = ({ confirm }) => {
     let unsubscribe;
     const getUser = async () => {
       unsubscribe = auth().onAuthStateChanged(user => {
-        if (user) {
+        if (
+          user &&
+          !clickedRef.current &&
+          user?.phone_number === '+91' + session.phoneNumber
+        ) {
           confirmApi();
         }
       });
@@ -109,6 +114,7 @@ const OTP = ({ confirm }) => {
           });
         }
       }
+      clickedRef.current = true;
       try {
         const res = await axios.post(
           `${API_DOMAIN}/api/v1/check-phone-number-email`,

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "467972202681",
+    "project_id": "noddy--customer",
+    "storage_bucket": "noddy--customer.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:467972202681:android:118e03c2928a1f3f067b68",
+        "android_client_info": {
+          "package_name": "com.noddyDeliversDriver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "467972202681-rm0cs79jl5hit6ucnohct7cu4oq59683.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.noddyDeliversDriver",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "467972202681-uvtbihmhtbkb1p0poh1clui4t4id94h2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAymTma_8S_uRplnSYRVNRbf1Bl_ZqWehs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "467972202681-uvtbihmhtbkb1p0poh1clui4t4id94h2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

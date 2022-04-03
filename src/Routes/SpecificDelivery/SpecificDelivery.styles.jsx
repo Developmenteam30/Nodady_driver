@@ -21,6 +21,7 @@ const Styles = StyleSheet.create({
     flexShrink: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
+    marginTop: 20,
   },
   cardSection: {
     paddingHorizontal: 24,

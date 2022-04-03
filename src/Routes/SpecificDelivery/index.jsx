@@ -259,7 +259,7 @@ const SpecificDelivery = () => {
                   <View style={{ width: '50%' }}>
                     <Text style={Styles.subText}>Total Product Price</Text>
                     <Text style={Styles.subTitle}>
-                      Rs. {session.forwardOrderDetails.order_price}
+                      Rs. {session.forwardOrderDetails.product_price}
                     </Text>
                   </View>
                 </View>
@@ -282,25 +282,6 @@ const SpecificDelivery = () => {
                         {session.forwardOrderDetails.hsn || '-'}
                       </Text>
                     </View>
-                  </View>
-                </View>
-                <View
-                  style={{
-                    ...Styles.rowSection,
-                    marginVertical: 16,
-                    width: '90%',
-                  }}>
-                  <View style={{ width: '45%' }}>
-                    <Text style={Styles.subText}>Unit Price</Text>
-                    <Text style={Styles.subTitle}>
-                      Rs. {session.forwardOrderDetails.product_price}
-                    </Text>
-                  </View>
-                  <View style={{ width: '45%' }}>
-                    <Text style={Styles.subText}>Quantity</Text>
-                    <Text style={Styles.subTitle}>
-                      {session.forwardOrderDetails.quantity}
-                    </Text>
                   </View>
                 </View>
                 <View style={Styles.allButtonSection}>

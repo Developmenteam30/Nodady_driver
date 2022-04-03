@@ -8,7 +8,6 @@ const ChangePassword = lazy(() => import('./ChangePassword'));
 const Pickup = lazy(() => import('./Pickup'));
 const Delivery = lazy(() => import('./Delivery'));
 const SpecificDelivery = lazy(() => import('./SpecificDelivery'));
-const SpecificPickup = lazy(() => import('./SpecificPickup'));
 const OTPDelivery = lazy(() => import('./OTPDelivery'));
 const Statistics = lazy(() => import('./Statistics'));
 
@@ -22,7 +21,6 @@ export default {
   ChangePassword,
   Delivery,
   SpecificDelivery,
-  SpecificPickup,
   OTPDelivery,
   Statistics,
 };

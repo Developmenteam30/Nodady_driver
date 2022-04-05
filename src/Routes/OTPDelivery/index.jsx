@@ -28,43 +28,24 @@ const OTPDelivery = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const confirmApi = async () => {
+    console.log('here');
     try {
-      try {
-        const token = await AsyncStorage.getItem('authData');
-        const res = await axios.post(
-          `${API_DOMAIN}/api/v1/update-order`,
-          {
-            post_value: 'completed',
-            order_id: params.id,
+      const token = await AsyncStorage.getItem('authData');
+      const res = await axios.post(
+        `${API_DOMAIN}/api/v1/update-order`,
+        {
+          post_value: 'completed',
+          order_id: params.id,
+        },
+        {
+          headers: {
+            authorization: `Bearer ${JSON.parse(token).token}`,
           },
-          {
-            headers: {
-              authorization: `Bearer ${JSON.parse(token).token}`,
-            },
-          },
-        );
-        if (res?.data) {
-          session.setIsLoading(false);
-          setShowConfirmModal(true);
-        }
-      } catch (error) {
+        },
+      );
+      if (res?.data) {
         session.setIsLoading(false);
-        if (error.response) {
-          let firstError =
-            Object.values(error.response.data) &&
-            Object.values(error.response.data)[0] &&
-            Object.values(error.response.data)[0][0];
-          if (firstError) {
-            return notification.setNotificationObject({
-              type: 'error',
-              message: firstError,
-            });
-          }
-        }
-        return notification.setNotificationObject({
-          type: 'error',
-          message: error,
-        });
+        setShowConfirmModal(true);
       }
     } catch (error) {
       session.setIsLoading(false);
@@ -73,10 +54,6 @@ const OTPDelivery = () => {
           Object.values(error.response.data) &&
           Object.values(error.response.data)[0] &&
           Object.values(error.response.data)[0][0];
-        if (firstError.toLowerCase() === 'phone number already exists.') {
-          navigate('/reset-password');
-          return;
-        }
         if (firstError) {
           return notification.setNotificationObject({
             type: 'error',
@@ -130,6 +107,7 @@ const OTPDelivery = () => {
             user?.phone_number ===
               '+91' + session.forwardOrderDetails.customer_phone_number
           ) {
+            console.log('called');
             confirmApi();
           }
         });
@@ -140,6 +118,7 @@ const OTPDelivery = () => {
   }, [confirmation]);
 
   const handleSubmit = async () => {
+    console.log('called here');
     if (!otp) {
       return notification.setNotificationObject({
         type: 'error',

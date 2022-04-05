@@ -42,11 +42,25 @@ const PhoneNumberSignIn = () => {
         },
       );
       if (res?.data) {
+        const confirmation = await auth()
+          .signInWithPhoneNumber('+91' + session.phoneNumber, true)
+          .catch(err => {
+            if (err.code === 'auth/too-many-requests') {
+              session.setIsLoading(false);
+              return notification.setNotificationObject({
+                type: 'error',
+                message:
+                  'Too many requests for this number. Please try again in 24 hours.',
+              });
+            }
+            session.setIsLoading(false);
+            return notification.setNotificationObject({
+              type: 'error',
+              message: JSON.stringify(err),
+            });
+          });
+        setConfirm(confirmation);
         session.setIsLoading(false);
-        return notification.setNotificationObject({
-          type: 'error',
-          message: 'Phone Number not found',
-        });
       }
     } catch (error) {
       if (error.response) {
@@ -54,30 +68,7 @@ const PhoneNumberSignIn = () => {
           Object.values(error.response.data) &&
           Object.values(error.response.data)[0] &&
           Object.values(error.response.data)[0][0];
-        if (
-          firstError !== 'invalid user type, user should be rider or manager.'
-        ) {
-          const confirmation = await auth()
-            .signInWithPhoneNumber('+91' + session.phoneNumber, true)
-            .catch(err => {
-              if (err.code === 'auth/too-many-requests') {
-                session.setIsLoading(false);
-                return notification.setNotificationObject({
-                  type: 'error',
-                  message:
-                    'Too many requests for this number. Please try again in 24 hours.',
-                });
-              }
-              session.setIsLoading(false);
-              return notification.setNotificationObject({
-                type: 'error',
-                message: JSON.stringify(err),
-              });
-            });
-          setConfirm(confirmation);
-          session.setIsLoading(false);
-          return;
-        } else if (firstError === 'phone number not found.') {
+        if (firstError === 'phone number not found.') {
           session.setIsLoading(false);
           return notification.setNotificationObject({
             type: 'error',

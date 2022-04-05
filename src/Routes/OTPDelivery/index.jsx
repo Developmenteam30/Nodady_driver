@@ -29,7 +29,43 @@ const OTPDelivery = () => {
 
   const confirmApi = async () => {
     try {
-      setShowConfirmModal(true);
+      try {
+        const token = await AsyncStorage.getItem('authData');
+        const res = await axios.post(
+          `${API_DOMAIN}/api/v1/update-order`,
+          {
+            post_value: 'completed',
+            order_id: params.id,
+          },
+          {
+            headers: {
+              authorization: `Bearer ${JSON.parse(token).token}`,
+            },
+          },
+        );
+        if (res?.data) {
+          session.setIsLoading(false);
+          setShowConfirmModal(true);
+        }
+      } catch (error) {
+        session.setIsLoading(false);
+        if (error.response) {
+          let firstError =
+            Object.values(error.response.data) &&
+            Object.values(error.response.data)[0] &&
+            Object.values(error.response.data)[0][0];
+          if (firstError) {
+            return notification.setNotificationObject({
+              type: 'error',
+              message: firstError,
+            });
+          }
+        }
+        return notification.setNotificationObject({
+          type: 'error',
+          message: error,
+        });
+      }
     } catch (error) {
       session.setIsLoading(false);
       if (error.response) {
@@ -91,7 +127,8 @@ const OTPDelivery = () => {
           if (
             user &&
             !clickedRef.current &&
-            user?.phone_number === '+91' + session.phoneNumber
+            user?.phone_number ===
+              '+91' + session.forwardOrderDetails.customer_phone_number
           ) {
             confirmApi();
           }
@@ -121,16 +158,6 @@ const OTPDelivery = () => {
         try {
           await confirmation.confirm(otp);
           setConfirmation(undefined);
-        } catch (err) {
-          session.setIsLoading(false);
-          return notification.setNotificationObject({
-            type: 'error',
-            message: 'Invalid OTP',
-          });
-        }
-      } else {
-        try {
-          await confirm.confirm(otp);
         } catch (err) {
           session.setIsLoading(false);
           return notification.setNotificationObject({

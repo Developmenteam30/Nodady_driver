@@ -36,7 +36,7 @@ const PhoneNumberSignIn = () => {
 
     try {
       const res = await axios.post(
-        `${API_DOMAIN}/api/v1/check-phone-number-email`,
+        `${API_DOMAIN}/api/v1/check-rider-manager-phone-number`,
         {
           phone_number: session.phoneNumber,
         },
@@ -54,7 +54,9 @@ const PhoneNumberSignIn = () => {
           Object.values(error.response.data) &&
           Object.values(error.response.data)[0] &&
           Object.values(error.response.data)[0][0];
-        if (firstError) {
+        if (
+          firstError !== 'invalid user type, user should be rider or manager.'
+        ) {
           const confirmation = await auth()
             .signInWithPhoneNumber('+91' + session.phoneNumber, true)
             .catch(err => {
@@ -75,8 +77,21 @@ const PhoneNumberSignIn = () => {
           setConfirm(confirmation);
           session.setIsLoading(false);
           return;
+        } else if (firstError === 'phone number not found.') {
+          session.setIsLoading(false);
+          return notification.setNotificationObject({
+            type: 'error',
+            message: firstError,
+          });
+        } else if (firstError) {
+          session.setIsLoading(false);
+          return notification.setNotificationObject({
+            type: 'error',
+            message: firstError,
+          });
         }
       }
+      session.setIsLoading(false);
       return notification.setNotificationObject({
         type: 'error',
         message: JSON.stringify(error),

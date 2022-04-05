@@ -77,11 +77,14 @@ const ResetPassword = () => {
     //reset password api call
     session.setIsLoading(true);
     try {
-      const res = await axios.post(`${API_DOMAIN}/api/v1/forgot-password`, {
-        phone_number: session.phoneNumber,
-        new_password: newPassword,
-        confirm_password: confirmPassword,
-      });
+      const res = await axios.post(
+        `${API_DOMAIN}/api/v1/forgot-password-rider-manager`,
+        {
+          phone_number: session.phoneNumber,
+          new_password: newPassword,
+          confirm_password: confirmPassword,
+        },
+      );
       if (res?.data) {
         navigate('/signin');
         notification.setNotificationObject({
@@ -91,6 +94,7 @@ const ResetPassword = () => {
         session.setIsLoading(false);
       }
     } catch (error) {
+      console.log(error);
       session.setIsLoading(false);
       if (error.response) {
         let firstError =

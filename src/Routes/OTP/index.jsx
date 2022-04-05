@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import { Text, View, ScrollView, Image, StatusBar } from 'react-native';
 import Button from '../../Components/Shared/Button';
 import Styles from './OTP.styles';
@@ -22,6 +22,7 @@ const OTP = ({ confirm }) => {
   const [otp, setOtp] = useState(undefined);
   const [confirmation, setConfirmation] = useState(undefined);
   const clickedRef = useRef(false);
+  const [timerReset, setTimerReset] = useState(false);
 
   const confirmApi = async () => {
     try {
@@ -177,13 +178,19 @@ const OTP = ({ confirm }) => {
         });
       });
     setConfirmation(confirmat);
+    if (confirmat) {
+      setTimerReset(true);
+      setTimeout(() => {
+        setTimerReset(false);
+      }, 50000);
+    }
   };
 
   return (
     <>
       <StatusBar backgroundColor="white" barStyle="dark-content" />
       <ScrollView keyboardShouldPersistTaps="handled">
-        <BreadCrumbs showTimer resendOTP={resendOTP} />
+        <BreadCrumbs showTimer resendOTP={resendOTP} timerReset={timerReset} />
         <View style={Styles.contentSection}>
           <Text style={Styles.heading}>OTP Verification</Text>
           <Text style={Styles.subTitle}>

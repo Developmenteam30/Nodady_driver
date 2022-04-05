@@ -118,7 +118,6 @@ const OTPDelivery = () => {
   }, [confirmation]);
 
   const handleSubmit = async () => {
-    console.log('called here');
     if (!otp) {
       return notification.setNotificationObject({
         type: 'error',
@@ -192,6 +191,30 @@ const OTPDelivery = () => {
     }
   };
 
+  const resendOTP = async () => {
+    const confirmat = await auth()
+      .signInWithPhoneNumber(
+        '+91' + session.forwardOrderDetails.customer_phone_number,
+        true,
+      )
+      .catch(err => {
+        if (err.code === 'auth/too-many-requests') {
+          session.setIsLoading(false);
+          return notification.setNotificationObject({
+            type: 'error',
+            message:
+              'Too many requests for this number. Please try again in 24 hours.',
+          });
+        }
+        session.setIsLoading(false);
+        return notification.setNotificationObject({
+          type: 'error',
+          message: JSON.stringify(err),
+        });
+      });
+    setConfirmation(confirmat);
+  };
+
   return (
     <>
       <StatusBar backgroundColor="white" barStyle="dark-content" />
@@ -205,7 +228,7 @@ const OTPDelivery = () => {
         />
       )}
       <ScrollView keyboardShouldPersistTaps="handled">
-        <BreadCrumbs />
+        <BreadCrumbs showTimer resendOTP={resendOTP} />
         <View style={Styles.contentSection}>
           <Text style={Styles.heading}>OTP Verification</Text>
           <Text style={Styles.subTitle}>

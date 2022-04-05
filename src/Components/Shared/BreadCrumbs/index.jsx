@@ -14,6 +14,7 @@ const BreadCrumbs = ({
   title,
   onPress,
   color,
+  timerReset,
 }) => {
   const navigate = useNavigate();
   const [timerCount, setTimer] = useState(60);
@@ -31,6 +32,12 @@ const BreadCrumbs = ({
       return () => clearInterval(interval);
     }
   }, []);
+
+  useEffect(() => {
+    if (timerReset) {
+      setTimer(60);
+    }
+  }, [timerReset]);
 
   return (
     <>

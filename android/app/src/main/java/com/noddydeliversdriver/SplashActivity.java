@@ -1,4 +1,4 @@
-package com.noddyDeliversDriver; 
+package com.noddydeliversdriver; 
 
 import android.content.Intent;
 import android.os.Bundle;

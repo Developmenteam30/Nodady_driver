@@ -14,6 +14,8 @@ import { NotificationContext } from '../../Context/Notification.context';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_DOMAIN } from '../../Variables/globals.variables';
+import DownloadIcon from '../../Assets/Images/download.png';
+import RNFetchBlob from 'rn-fetch-blob';
 
 const SpecificDelivery = () => {
   const params = useParams();
@@ -75,6 +77,10 @@ const SpecificDelivery = () => {
 
   const handleUpdate = async val => {
     try {
+      if (val === 'completed') {
+        navigate(`/otp-delivery/${params.id}`);
+        return;
+      }
       session.setIsLoading(true);
       const token = await AsyncStorage.getItem('authData');
       const res = await axios.post(
@@ -98,6 +104,7 @@ const SpecificDelivery = () => {
         });
       }
     } catch (error) {
+      console.log(error);
       session.setIsLoading(false);
       if (error.response) {
         let firstError =
@@ -115,6 +122,39 @@ const SpecificDelivery = () => {
         type: 'error',
         message: error,
       });
+    }
+  };
+
+  const download = () => {
+    try {
+      session.setIsLoading(true);
+      const { config, fs } = RNFetchBlob;
+      let DownloadDir = fs.dirs.DownloadDir;
+
+      let options = {
+        fileCache: true,
+        addAndroidDownloads: {
+          useDownloadManager: true, // setting it to true will use the device's native download manager and will be shown in the notification bar.
+          notification: true,
+          path: DownloadDir + '/orders_' + Math.floor(new Date()) + '.pdf', // this is the path where your downloaded file will live in
+          description: 'Downloading details.',
+        },
+      };
+      config(options)
+        .fetch(
+          'GET',
+          `${API_DOMAIN}/api/v1/order-reciept?order_id=${session.forwardOrderDetails.id}`,
+        )
+        .then(res => {
+          session.setIsLoading(false);
+          notification.setNotificationObject({
+            type: 'success',
+            message: 'Orders details downloaded',
+          });
+        })
+        .catch(err => console.log(err));
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -140,15 +180,15 @@ const SpecificDelivery = () => {
                 </View>
                 <View style={Styles.card}>
                   <Image source={CodIcon} />
-                  <Text style={Styles.subHeading}>
+                  <Text style={{ ...Styles.subHeading, marginTop: 30 }}>
                     {session.forwardOrderDetails?.payment_mode?.toUpperCase()}
                   </Text>
-                  <Text style={Styles.subText}></Text>
-                  <View style={{ marginTop: 15 }} />
-                  <View style={{ marginBottom: 15 }} />
-                  <Text style={Styles.subHeading}>Order Value</Text>
-                  <Text style={{ ...Styles.subHeading, marginTop: 0 }}>
-                    ₹ {session.forwardOrderDetails?.order_price}
+                  <Text style={Styles.subText}>
+                    ₹{' '}
+                    {session.forwardOrderDetails?.payment_mode?.toUpperCase() ===
+                    'COD'
+                      ? session.forwardOrderDetails?.product_price
+                      : '0'}
                   </Text>
                 </View>
                 <View style={Styles.card}>
@@ -161,6 +201,17 @@ const SpecificDelivery = () => {
                   </Text>
                   <Text style={Styles.subText}>Entered Weight</Text>
                 </View>
+              </View>
+              <View style={Styles.buttonSection}>
+                <Button
+                  text={'DOWNLOAD ORDER RECIEPT'}
+                  onPress={() => download()}
+                  color={Constants.primaryColor}
+                  backgroundColor="white"
+                  borderColor={Constants.primaryColor}
+                  borderWidth={1}
+                  icon={DownloadIcon}
+                />
               </View>
               <View style={Styles.shipmentSection}>
                 <Text style={Styles.heading}>Shipment Details</Text>
@@ -256,14 +307,14 @@ const SpecificDelivery = () => {
                       ).toLocaleDateString()}
                     </Text>
                   </View>
-                  <View style={{ width: '50%' }}>
+                  {/* <View style={{ width: '50%' }}>
                     <Text style={Styles.subText}>Total Product Price</Text>
                     <Text style={Styles.subTitle}>
                       Rs. {session.forwardOrderDetails.product_price}
                     </Text>
-                  </View>
+                  </View> */}
                 </View>
-                <View style={Styles.rowSection}>
+                {/* <View style={Styles.rowSection}>
                   <View
                     style={{
                       ...Styles.rowSection,
@@ -283,7 +334,7 @@ const SpecificDelivery = () => {
                       </Text>
                     </View>
                   </View>
-                </View>
+                </View> */}
                 <View style={Styles.allButtonSection}>
                   {buttons.map((obj, i) => {
                     return (

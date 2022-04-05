@@ -35,7 +35,7 @@ const Main = () => {
                 element={<NavigationRoutes.ChangePassword />}
               />
               <Route
-                path="/otp-delivery"
+                path="/otp-delivery/:id"
                 element={<NavigationRoutes.OTPDelivery />}
               />
               <Route path="/pickup" element={<NavigationRoutes.Pickup />} />

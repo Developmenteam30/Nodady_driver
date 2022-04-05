@@ -3,13 +3,13 @@ import firebase from '@react-native-firebase/app';
 import auth from '@react-native-firebase/auth';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyCnhPH5s-27opkpSercjTdiA-9ISXDDXK4',
-  authDomain: 'noddy--customer.firebaseapp.com',
-  projectId: 'noddy--customer',
-  storageBucket: 'noddy--customer.appspot.com',
-  messagingSenderId: '467972202681',
-  appId: '1:467972202681:web:41cbd986df9a2f1a067b68',
-  measurementId: 'G-XW2BRHC278',
+  apiKey: 'AIzaSyB_O_M3P7vmHO4HsoEpmXNemSYrWZ_EI6c',
+  authDomain: 'noddy-delivers.firebaseapp.com',
+  projectId: 'noddy-delivers',
+  storageBucket: 'noddy-delivers.appspot.com',
+  messagingSenderId: '736930000753',
+  appId: '1:736930000753:web:c1c7a820325169901ed0d0',
+  measurementId: 'G-TEEWSV9B73',
 };
 
 if (!firebase.apps.length) {

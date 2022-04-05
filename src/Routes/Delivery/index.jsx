@@ -88,7 +88,9 @@ const Delivery = () => {
                 onPress={() => {
                   navigate(`/order/${obj.id}`);
                 }}>
-                <Text style={Styles.name}>{obj.business_owner}</Text>
+                <Text style={Styles.name}>
+                  {obj.customer_first_name + ' ' + obj.customer_last_name}
+                </Text>
                 <Text style={Styles.orderId}>Order Id</Text>
                 <Text style={Styles.orderIdNumber}>{obj.order_id}</Text>
               </TouchableOpacity>

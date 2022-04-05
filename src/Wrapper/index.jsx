@@ -33,7 +33,7 @@ const Wrapper = () => {
 
   const getUserData = async () => {
     try {
-      const jsonValue = await AsyncStorage.removeItem('authData');
+      const jsonValue = await AsyncStorage.getItem('authData');
       if (jsonValue) {
         const userInfo = jsonValue !== null ? JSON.parse(jsonValue) : null;
         if (userInfo.token) {

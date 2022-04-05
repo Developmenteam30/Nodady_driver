@@ -1,18 +1,24 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Text, View, ScrollView, Image, StatusBar } from 'react-native';
 import Button from '../../Components/Shared/Button';
 import Styles from './OTPDelivery.styles';
 import BreadCrumbs from '../../Components/Shared/BreadCrumbs';
 import Constants from '../../Variables/colors.variables';
-import { useNavigate } from 'react-router-native';
+import { useNavigate, useParams } from 'react-router-native';
 import OTPImage from '../../Assets/Images/otpScreen.png';
 import OTPTextInput from 'react-native-otp-textinput';
 import { AppContext } from '../../Context/App.context';
 import firebaseSetup from '../../../setup';
 import ConfirmationModal from '../../Components/ConfirmationModal';
 import { NotificationContext } from '../../Context/Notification.context';
+import { useRef } from 'react';
+import { API_DOMAIN } from '../../Variables/globals.variables';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const OTPDelivery = () => {
+  const params = useParams();
+  const clickedRef = useRef();
   const session = useContext(AppContext);
   const navigate = useNavigate();
   const notification = useContext(NotificationContext);
@@ -20,6 +26,81 @@ const OTPDelivery = () => {
   const [otp, setOtp] = useState(undefined);
   const [confirmation, setConfirmation] = useState(undefined);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  const confirmApi = async () => {
+    try {
+      setShowConfirmModal(true);
+    } catch (error) {
+      session.setIsLoading(false);
+      if (error.response) {
+        let firstError =
+          Object.values(error.response.data) &&
+          Object.values(error.response.data)[0] &&
+          Object.values(error.response.data)[0][0];
+        if (firstError.toLowerCase() === 'phone number already exists.') {
+          navigate('/reset-password');
+          return;
+        }
+        if (firstError) {
+          return notification.setNotificationObject({
+            type: 'error',
+            message: firstError,
+          });
+        }
+      }
+      return notification.setNotificationObject({
+        type: 'error',
+        message: error,
+      });
+    }
+  };
+
+  useEffect(() => {
+    sendOTP();
+  }, []);
+
+  const sendOTP = async () => {
+    const confirmation = await auth()
+      .signInWithPhoneNumber(
+        '+91' + session.forwardOrderDetails.customer_phone_number,
+        true,
+      )
+      .catch(err => {
+        if (err.code === 'auth/too-many-requests') {
+          session.setIsLoading(false);
+          return notification.setNotificationObject({
+            type: 'error',
+            message:
+              'Too many requests for this number. Please try again in 24 hours.',
+          });
+        }
+        session.setIsLoading(false);
+        return notification.setNotificationObject({
+          type: 'error',
+          message: JSON.stringify(err),
+        });
+      });
+    setConfirmation(confirmation);
+  };
+
+  useEffect(() => {
+    if (confirmation) {
+      let unsubscribe;
+      const getUser = async () => {
+        unsubscribe = auth().onAuthStateChanged(user => {
+          if (
+            user &&
+            !clickedRef.current &&
+            user?.phone_number === '+91' + session.phoneNumber
+          ) {
+            confirmApi();
+          }
+        });
+      };
+      getUser();
+      return unsubscribe;
+    }
+  }, [confirmation]);
 
   const handleSubmit = async () => {
     if (!otp) {
@@ -34,10 +115,76 @@ const OTPDelivery = () => {
         message: 'OTP length should be atleast 6',
       });
     }
-    setShowConfirmModal(true);
+    session.setIsLoading(true);
+    try {
+      if (confirmation) {
+        try {
+          await confirmation.confirm(otp);
+          setConfirmation(undefined);
+        } catch (err) {
+          session.setIsLoading(false);
+          return notification.setNotificationObject({
+            type: 'error',
+            message: 'Invalid OTP',
+          });
+        }
+      } else {
+        try {
+          await confirm.confirm(otp);
+        } catch (err) {
+          session.setIsLoading(false);
+          return notification.setNotificationObject({
+            type: 'error',
+            message: 'Invalid OTP',
+          });
+        }
+      }
+      clickedRef.current = true;
+      try {
+        const token = await AsyncStorage.getItem('authData');
+        const res = await axios.post(
+          `${API_DOMAIN}/api/v1/update-order`,
+          {
+            post_value: 'completed',
+            order_id: params.id,
+          },
+          {
+            headers: {
+              authorization: `Bearer ${JSON.parse(token).token}`,
+            },
+          },
+        );
+        if (res?.data) {
+          session.setIsLoading(false);
+          setShowConfirmModal(true);
+        }
+      } catch (error) {
+        session.setIsLoading(false);
+        if (error.response) {
+          let firstError =
+            Object.values(error.response.data) &&
+            Object.values(error.response.data)[0] &&
+            Object.values(error.response.data)[0][0];
+          if (firstError) {
+            return notification.setNotificationObject({
+              type: 'error',
+              message: firstError,
+            });
+          }
+        }
+        return notification.setNotificationObject({
+          type: 'error',
+          message: error,
+        });
+      }
+    } catch (err) {
+      session.setIsLoading(false);
+      return notification.setNotificationObject({
+        type: 'error',
+        message: err,
+      });
+    }
   };
-
-  const resendOTP = async () => {};
 
   return (
     <>
@@ -52,7 +199,7 @@ const OTPDelivery = () => {
         />
       )}
       <ScrollView keyboardShouldPersistTaps="handled">
-        <BreadCrumbs showTimer resendOTP={resendOTP} />
+        <BreadCrumbs />
         <View style={Styles.contentSection}>
           <Text style={Styles.heading}>OTP Verification</Text>
           <Text style={Styles.subTitle}>

@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Text,
   Dimensions,
+  FlatList,
 } from 'react-native';
 import Styles from './Statistics.styles';
 import { useContext } from 'react';
@@ -27,6 +28,8 @@ const Statistics = () => {
   });
   const [cod, setCod] = useState([]);
   const [client, setClient] = useState([]);
+  const [notPaid, setNotPaid] = useState([]);
+  const [possessive, setPossessive] = useState([]);
 
   useEffect(() => {
     getStatistics();
@@ -110,56 +113,139 @@ const Statistics = () => {
     }
   };
 
+  const getNotPaid = async () => {
+    try {
+      session.setIsLoading(true);
+      const token = await AsyncStorage.getItem('authData');
+      const res = await axios.get(`${API_DOMAIN}/api/v1/not-paid-cod-list`, {
+        headers: {
+          authorization: `Bearer ${JSON.parse(token).token}`,
+        },
+      });
+      if (res?.data) {
+        setNotPaid(res.data.detail);
+        session.setIsLoading(false);
+      }
+    } catch (error) {
+      session.setIsLoading(false);
+      return notification.setNotificationObject({
+        type: 'error',
+        message: error?.response?.data?.detail,
+      });
+    }
+  };
+
+  const getPossessive = async () => {
+    try {
+      session.setIsLoading(true);
+      const token = await AsyncStorage.getItem('authData');
+      const res = await axios.get(
+        `${API_DOMAIN}/api/v1/current-possessed-parcel`,
+        {
+          headers: {
+            authorization: `Bearer ${JSON.parse(token).token}`,
+          },
+        },
+      );
+      if (res?.data) {
+        setPossessive(res.data.detail);
+        session.setIsLoading(false);
+      }
+    } catch (error) {
+      session.setIsLoading(false);
+      return notification.setNotificationObject({
+        type: 'error',
+        message: error?.response?.data?.detail,
+      });
+    }
+  };
+
+  const items = [
+    {
+      label: 'General',
+      value: 'GENERAL',
+      onPress: () => {
+        getStatistics();
+        setActive('GENERAL');
+      },
+    },
+    {
+      label: 'COD',
+      value: 'COD',
+      onPress: () => {
+        getCOD();
+        setActive('COD');
+      },
+    },
+    {
+      label: 'Client',
+      value: 'CLIENT',
+      onPress: () => {
+        getClient();
+        setActive('CLIENT');
+      },
+    },
+    {
+      label: 'Not Paid',
+      value: 'NOT_PAID',
+      onPress: () => {
+        getNotPaid();
+        setActive('NOT_PAID');
+      },
+    },
+    {
+      label: 'Possessive',
+      value: 'POSSESSIVE',
+      onPress: () => {
+        getPossessive();
+        setActive('POSSESSIVE');
+      },
+    },
+  ];
+
+  const getStatus = status => {
+    let data = {
+      open: 'Open',
+      cancelled: 'Cancelled',
+      pickup: 'Picked Up',
+      head_office: 'Head Office',
+      out_for_delivery: 'Out For Delivery',
+      intransit: 'In Transit',
+      completed: 'Completed',
+      return_requested: 'Requested Returned',
+      return_intransit: 'Returned In Transit',
+      returned: 'Returned',
+    };
+    return data[status];
+  };
+
   return (
     <>
       <StatusBar backgroundColor="white" barStyle="dark-content" />
       <BreadCrumbs title="Statistics" />
       <View style={Styles.buttonSection}>
-        <TouchableOpacity
-          style={active === 'GENERAL' ? Styles.active : Styles.inactive}
-          onPress={() => {
-            getStatistics();
-            setActive('GENERAL');
-          }}>
-          <Text
-            style={
-              active === 'GENERAL'
-                ? Styles.activeButtonText
-                : Styles.inactiveButtonText
-            }>
-            General
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={active === 'COD' ? Styles.active : Styles.inactive}
-          onPress={() => {
-            getCOD();
-            setActive('COD');
-          }}>
-          <Text
-            style={
-              active === 'COD'
-                ? Styles.activeButtonText
-                : Styles.inactiveButtonText
-            }>
-            COD
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={active === 'CLIENT' ? Styles.active : Styles.inactive}
-          onPress={() => {
-            getClient();
-            setActive('CLIENT');
-          }}>
-          <Text
-            style={
-              active === 'CLIENT'
-                ? Styles.activeButtonText
-                : Styles.inactiveButtonText
-            }>
-            Client
-          </Text>
-        </TouchableOpacity>
+        <FlatList
+          horizontal
+          data={items}
+          renderItem={({ item }) => {
+            return (
+              <TouchableOpacity
+                style={active === item.value ? Styles.active : Styles.inactive}
+                onPress={() => {
+                  item.onPress();
+                }}>
+                <Text
+                  style={
+                    active === item.value
+                      ? Styles.activeButtonText
+                      : Styles.inactiveButtonText
+                  }>
+                  {item.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          }}
+        />
       </View>
       <ScrollView
         keyboardShouldPersistTaps="handled"
@@ -173,7 +259,15 @@ const Statistics = () => {
               ? client.length > 0
                 ? 0
                 : 1
-              : cod.length > 0
+              : active === 'COD'
+              ? cod.length > 0
+                ? 0
+                : 1
+              : active === 'NOT_PAID'
+              ? notPaid.length > 0
+                ? 0
+                : 1
+              : active === 'POSSESSIVE' && possessive.length > 0
               ? 0
               : 1,
         }}>
@@ -238,6 +332,49 @@ const Statistics = () => {
                     <View style={Styles.codRightCard}>
                       <Text style={Styles.codName}>{obj.user_full_name}</Text>
                       <Text style={Styles.codAmount}>₹ {obj.cod}</Text>
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          )}
+          {active === 'NOT_PAID' && (
+            <View style={Styles.codSection}>
+              {notPaid.map((obj, ind) => {
+                return (
+                  <View key={ind} style={Styles.codCard}>
+                    <View style={Styles.codLeftSection}>
+                      <Text style={Styles.codName}>
+                        {obj.company_name.substring(0, 1)}
+                      </Text>
+                    </View>
+                    <View style={Styles.codRightCard}>
+                      <Text style={Styles.codName}>{obj.company_name}</Text>
+                      <Text style={Styles.codAmount}>
+                        ₹ {obj.initial_cod_amount}
+                      </Text>
+                      <Text style={Styles.orderID}>{obj.long_order_id}</Text>
+                      <Text>{getStatus(obj.order_status)}</Text>
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          )}
+          {active === 'POSSESSIVE' && (
+            <View style={Styles.codSection}>
+              {possessive.map((obj, ind) => {
+                return (
+                  <View key={ind} style={Styles.codCard}>
+                    <View style={Styles.codLeftSection}>
+                      <Text style={Styles.codName}>
+                        {obj.company_name.substring(0, 1)}
+                      </Text>
+                    </View>
+                    <View style={Styles.codRightCard}>
+                      <Text style={Styles.codName}>{obj.company_name}</Text>
+                      <Text style={Styles.orderID}>{obj.long_order_id}</Text>
+                      <Text>{getStatus(obj.order_status)}</Text>
                     </View>
                   </View>
                 );

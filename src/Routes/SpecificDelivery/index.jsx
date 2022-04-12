@@ -143,7 +143,7 @@ const SpecificDelivery = () => {
       config(options)
         .fetch(
           'GET',
-          `${API_DOMAIN}/api/v1/order-reciept?order_id=${session.forwardOrderDetails.id}`,
+          `${API_DOMAIN}/api/v1/rider-order-reciept?order_id=${session.forwardOrderDetails.id}`,
         )
         .then(res => {
           session.setIsLoading(false);

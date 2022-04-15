@@ -19,17 +19,20 @@ import { API_DOMAIN } from '../../Variables/globals.variables';
 
 const Statistics = () => {
   const session = useContext(AppContext);
+  const [errorMessage, setErrorMessage] = useState(undefined);
   const notification = useContext(NotificationContext);
   const [active, setActive] = useState('GENERAL');
   const [generalData, setGeneralData] = useState({
-    total_cash_on_delivery_amount: 0,
-    total_number_of_deliveries: 0,
-    total_number_of_pickups_and_deliveries: 0,
+    total_number_of_pickup: 0,
+    total_number_of_delivery: 0,
+    not_paid_cod_amount: 0,
+    salary: 0,
   });
   const [cod, setCod] = useState([]);
   const [client, setClient] = useState([]);
   const [notPaid, setNotPaid] = useState([]);
   const [possessive, setPossessive] = useState([]);
+  const [apiCallMade, setApiCallMade] = useState(false);
 
   useEffect(() => {
     getStatistics();
@@ -45,8 +48,13 @@ const Statistics = () => {
         },
       });
       if (res?.data) {
+        console.log(res.data);
+        if (res.data.detail) {
+          setErrorMessage(res.data.detail[0]);
+        }
         setGeneralData(res.data);
         session.setIsLoading(false);
+        setApiCallMade(true);
       }
     } catch (error) {
       session.setIsLoading(false);
@@ -221,168 +229,193 @@ const Statistics = () => {
 
   return (
     <>
-      <StatusBar backgroundColor="white" barStyle="dark-content" />
-      <BreadCrumbs title="Statistics" />
-      <View style={Styles.buttonSection}>
-        <FlatList
-          horizontal
-          data={items}
-          renderItem={({ item }) => {
-            return (
-              <TouchableOpacity
-                style={active === item.value ? Styles.active : Styles.inactive}
-                onPress={() => {
-                  item.onPress();
-                }}>
-                <Text
+      {apiCallMade && (
+        <>
+          <StatusBar backgroundColor="white" barStyle="dark-content" />
+          <BreadCrumbs title="Statistics" />
+          <View style={Styles.buttonSection}>
+            <FlatList
+              horizontal
+              data={items}
+              renderItem={({ item }) => {
+                return (
+                  <TouchableOpacity
+                    style={
+                      active === item.value ? Styles.active : Styles.inactive
+                    }
+                    onPress={() => {
+                      item.onPress();
+                    }}>
+                    <Text
+                      style={
+                        active === item.value
+                          ? Styles.activeButtonText
+                          : Styles.inactiveButtonText
+                      }>
+                      {item.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }}
+            />
+          </View>
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{
+              minHeight: Dimensions.get('window').height - 150,
+              backgroundColor: 'red',
+              flex:
+                active === 'GENERAL'
+                  ? 1
+                  : active === 'CLIENT'
+                  ? client.length > 0
+                    ? 0
+                    : 1
+                  : active === 'COD'
+                  ? cod.length > 0
+                    ? 0
+                    : 1
+                  : active === 'NOT_PAID'
+                  ? notPaid.length > 0
+                    ? 0
+                    : 1
+                  : active === 'POSSESSIVE' && possessive.length > 0
+                  ? 0
+                  : 1,
+            }}>
+            <View style={Styles.container}>
+              {active === 'GENERAL' && (
+                <View
                   style={
-                    active === item.value
-                      ? Styles.activeButtonText
-                      : Styles.inactiveButtonText
+                    errorMessage ? Styles.errorSection : Styles.generalSection
                   }>
-                  {item.label}
-                </Text>
-              </TouchableOpacity>
-            );
-          }}
-        />
-      </View>
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{
-          minHeight: Dimensions.get('window').height - 150,
-          backgroundColor: 'red',
-          flex:
-            active === 'GENERAL'
-              ? 1
-              : active === 'CLIENT'
-              ? client.length > 0
-                ? 0
-                : 1
-              : active === 'COD'
-              ? cod.length > 0
-                ? 0
-                : 1
-              : active === 'NOT_PAID'
-              ? notPaid.length > 0
-                ? 0
-                : 1
-              : active === 'POSSESSIVE' && possessive.length > 0
-              ? 0
-              : 1,
-        }}>
-        <View style={Styles.container}>
-          {active === 'GENERAL' && (
-            <View style={Styles.generalSection}>
-              <View style={Styles.generalCard1}>
-                <Text style={Styles.generalHeading}>
-                  Total number of pickups and deliveries
-                </Text>
-                <Text style={Styles.generalSubHeading}>
-                  {generalData.total_number_of_pickups_and_deliveries}
-                </Text>
-              </View>
-              <View style={Styles.generalCard2}>
-                <Text style={Styles.generalHeading}>
-                  Total number of deliveries
-                </Text>
-                <Text style={Styles.generalSubHeading}>
-                  {generalData.total_number_of_deliveries}
-                </Text>
-              </View>
-              <View style={Styles.generalCard3}>
-                <Text style={Styles.generalHeading}>
-                  Total Cash on delivery amount
-                </Text>
-                <Text style={Styles.generalSubHeading}>
-                  ₹ {generalData.total_cash_on_delivery_amount}
-                </Text>
-              </View>
+                  {errorMessage ? (
+                    <Text style={Styles.errorMessage}>{errorMessage}</Text>
+                  ) : (
+                    <>
+                      <View style={Styles.generalCard1}>
+                        <Text style={Styles.generalHeading}>
+                          Total number of pickups
+                        </Text>
+                        <Text style={Styles.generalSubHeading}>
+                          {generalData.total_number_of_pickup}
+                        </Text>
+                      </View>
+                      <View style={Styles.generalCard2}>
+                        <Text style={Styles.generalHeading}>
+                          Total number of deliveries
+                        </Text>
+                        <Text style={Styles.generalSubHeading}>
+                          {generalData.total_number_of_delivery}
+                        </Text>
+                      </View>
+                      <View style={Styles.generalCard3}>
+                        <Text style={Styles.generalHeading}>Pending COD</Text>
+                        <Text style={Styles.generalSubHeading}>
+                          ₹ {generalData.not_paid_cod_amount}
+                        </Text>
+                      </View>
+                      <View style={Styles.generalCard2}>
+                        <Text style={Styles.generalHeading}>Salary</Text>
+                        <Text style={Styles.generalSubHeading}>
+                          ₹ {generalData.salary}
+                        </Text>
+                      </View>
+                    </>
+                  )}
+                </View>
+              )}
+              {active === 'COD' && (
+                <View style={Styles.codSection}>
+                  {cod.map((obj, ind) => {
+                    return (
+                      <View key={ind} style={Styles.codCard}>
+                        <View style={Styles.codLeftSection}>
+                          <Text style={Styles.codName}>
+                            {obj.rider_name.substring(0, 1)}
+                          </Text>
+                        </View>
+                        <View style={Styles.codRightCard}>
+                          <Text style={Styles.codName}>{obj.rider_name}</Text>
+                          <Text style={Styles.codAmount}>₹ {obj.cod}</Text>
+                        </View>
+                      </View>
+                    );
+                  })}
+                </View>
+              )}
+              {active === 'CLIENT' && (
+                <View style={Styles.codSection}>
+                  {client.map((obj, ind) => {
+                    return (
+                      <View key={ind} style={Styles.codCard}>
+                        <View style={Styles.codLeftSection}>
+                          <Text style={Styles.codName}>
+                            {obj.user_full_name.substring(0, 1)}
+                          </Text>
+                        </View>
+                        <View style={Styles.codRightCard}>
+                          <Text style={Styles.codName}>
+                            {obj.user_full_name}
+                          </Text>
+                          <Text style={Styles.codAmount}>₹ {obj.cod}</Text>
+                        </View>
+                      </View>
+                    );
+                  })}
+                </View>
+              )}
+              {active === 'NOT_PAID' && (
+                <View style={Styles.codSection}>
+                  {notPaid.map((obj, ind) => {
+                    return (
+                      <View key={ind} style={Styles.codCard}>
+                        <View style={Styles.codLeftSection}>
+                          <Text style={Styles.codName}>
+                            {obj.company_name.substring(0, 1)}
+                          </Text>
+                        </View>
+                        <View style={Styles.codRightCard}>
+                          <Text style={Styles.codName}>{obj.company_name}</Text>
+                          <Text style={Styles.codAmount}>
+                            ₹ {obj.initial_cod_amount}
+                          </Text>
+                          <Text style={Styles.orderID}>
+                            {obj.long_order_id}
+                          </Text>
+                          <Text>{getStatus(obj.order_status)}</Text>
+                        </View>
+                      </View>
+                    );
+                  })}
+                </View>
+              )}
+              {active === 'POSSESSIVE' && (
+                <View style={Styles.codSection}>
+                  {possessive.map((obj, ind) => {
+                    return (
+                      <View key={ind} style={Styles.codCard}>
+                        <View style={Styles.codLeftSection}>
+                          <Text style={Styles.codName}>
+                            {obj.company_name.substring(0, 1)}
+                          </Text>
+                        </View>
+                        <View style={Styles.codRightCard}>
+                          <Text style={Styles.codName}>{obj.company_name}</Text>
+                          <Text style={Styles.orderID}>
+                            {obj.long_order_id}
+                          </Text>
+                          <Text>{getStatus(obj.order_status)}</Text>
+                        </View>
+                      </View>
+                    );
+                  })}
+                </View>
+              )}
             </View>
-          )}
-          {active === 'COD' && (
-            <View style={Styles.codSection}>
-              {cod.map((obj, ind) => {
-                return (
-                  <View key={ind} style={Styles.codCard}>
-                    <View style={Styles.codLeftSection}>
-                      <Text style={Styles.codName}>
-                        {obj.rider_name.substring(0, 1)}
-                      </Text>
-                    </View>
-                    <View style={Styles.codRightCard}>
-                      <Text style={Styles.codName}>{obj.rider_name}</Text>
-                      <Text style={Styles.codAmount}>₹ {obj.cod}</Text>
-                    </View>
-                  </View>
-                );
-              })}
-            </View>
-          )}
-          {active === 'CLIENT' && (
-            <View style={Styles.codSection}>
-              {client.map((obj, ind) => {
-                return (
-                  <View key={ind} style={Styles.codCard}>
-                    <View style={Styles.codLeftSection}>
-                      <Text style={Styles.codName}>
-                        {obj.user_full_name.substring(0, 1)}
-                      </Text>
-                    </View>
-                    <View style={Styles.codRightCard}>
-                      <Text style={Styles.codName}>{obj.user_full_name}</Text>
-                      <Text style={Styles.codAmount}>₹ {obj.cod}</Text>
-                    </View>
-                  </View>
-                );
-              })}
-            </View>
-          )}
-          {active === 'NOT_PAID' && (
-            <View style={Styles.codSection}>
-              {notPaid.map((obj, ind) => {
-                return (
-                  <View key={ind} style={Styles.codCard}>
-                    <View style={Styles.codLeftSection}>
-                      <Text style={Styles.codName}>
-                        {obj.company_name.substring(0, 1)}
-                      </Text>
-                    </View>
-                    <View style={Styles.codRightCard}>
-                      <Text style={Styles.codName}>{obj.company_name}</Text>
-                      <Text style={Styles.codAmount}>
-                        ₹ {obj.initial_cod_amount}
-                      </Text>
-                      <Text style={Styles.orderID}>{obj.long_order_id}</Text>
-                      <Text>{getStatus(obj.order_status)}</Text>
-                    </View>
-                  </View>
-                );
-              })}
-            </View>
-          )}
-          {active === 'POSSESSIVE' && (
-            <View style={Styles.codSection}>
-              {possessive.map((obj, ind) => {
-                return (
-                  <View key={ind} style={Styles.codCard}>
-                    <View style={Styles.codLeftSection}>
-                      <Text style={Styles.codName}>
-                        {obj.company_name.substring(0, 1)}
-                      </Text>
-                    </View>
-                    <View style={Styles.codRightCard}>
-                      <Text style={Styles.codName}>{obj.company_name}</Text>
-                      <Text style={Styles.orderID}>{obj.long_order_id}</Text>
-                      <Text>{getStatus(obj.order_status)}</Text>
-                    </View>
-                  </View>
-                );
-              })}
-            </View>
-          )}
-        </View>
-      </ScrollView>
+          </ScrollView>
+        </>
+      )}
     </>
   );
 };

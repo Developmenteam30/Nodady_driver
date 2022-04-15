@@ -50,6 +50,14 @@ const Styles = StyleSheet.create({
     marginHorizontal: 16,
     marginVertical: 8,
   },
+  errorSection: {
+    paddingHorizontal: 16,
+    marginVertical: 8,
+    flex: 1,
+    width: Dimensions.get('window').width,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   codSection: {
     marginHorizontal: 16,
     marginVertical: 8,
@@ -76,6 +84,12 @@ const Styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     color: Constants.primaryColor,
     marginLeft: 4,
+  },
+  errorMessage: {
+    fontSize: 15,
+    fontFamily: 'Poppins-Medium',
+    color: '#222224',
+    textAlign: 'center',
   },
   codName: {
     fontSize: 15,

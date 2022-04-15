@@ -178,6 +178,22 @@ const Statistics = () => {
       },
     },
     {
+      label: 'Not Paid',
+      value: 'NOT_PAID',
+      onPress: () => {
+        getNotPaid();
+        setActive('NOT_PAID');
+      },
+    },
+    {
+      label: 'Possession',
+      value: 'POSSESSIVE',
+      onPress: () => {
+        getPossessive();
+        setActive('POSSESSIVE');
+      },
+    },
+    {
       label: 'COD',
       value: 'COD',
       onPress: () => {
@@ -191,22 +207,6 @@ const Statistics = () => {
       onPress: () => {
         getClient();
         setActive('CLIENT');
-      },
-    },
-    {
-      label: 'Not Paid',
-      value: 'NOT_PAID',
-      onPress: () => {
-        getNotPaid();
-        setActive('NOT_PAID');
-      },
-    },
-    {
-      label: 'Possessive',
-      value: 'POSSESSIVE',
-      onPress: () => {
-        getPossessive();
-        setActive('POSSESSIVE');
       },
     },
   ];

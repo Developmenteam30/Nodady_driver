@@ -28,7 +28,6 @@ const OTPDelivery = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const confirmApi = async () => {
-    console.log('here');
     try {
       const token = await AsyncStorage.getItem('authData');
       const res = await axios.post(
@@ -107,7 +106,6 @@ const OTPDelivery = () => {
             user?.phone_number ===
               '+91' + session.forwardOrderDetails.customer_phone_number
           ) {
-            console.log('called');
             confirmApi();
           }
         });
@@ -225,6 +223,7 @@ const OTPDelivery = () => {
           handleConfirm={() => navigate('/dashboard')}
           text={'Order Placed successfully'}
           showSuccess
+          handleClose={() => setShowConfirmModal(false)}
         />
       )}
       <ScrollView keyboardShouldPersistTaps="handled">

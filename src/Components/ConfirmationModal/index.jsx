@@ -12,7 +12,6 @@ const ConfirmationModal = ({
   cancelButtonText,
   fontSize,
   showInput,
-  showImage,
   value,
   showSuccess,
   onChange,

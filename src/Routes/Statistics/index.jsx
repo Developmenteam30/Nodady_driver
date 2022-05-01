@@ -16,8 +16,10 @@ import { NotificationContext } from '../../Context/Notification.context';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_DOMAIN } from '../../Variables/globals.variables';
+import { useNavigate } from 'react-router-native';
 
 const Statistics = () => {
+  const navigate = useNavigate();
   const session = useContext(AppContext);
   const [errorMessage, setErrorMessage] = useState(undefined);
   const notification = useContext(NotificationContext);
@@ -48,7 +50,6 @@ const Statistics = () => {
         },
       });
       if (res?.data) {
-        console.log(res.data);
         if (res.data.detail) {
           setErrorMessage(res.data.detail[0]);
         }
@@ -394,7 +395,10 @@ const Statistics = () => {
                 <View style={Styles.codSection}>
                   {possessive.map((obj, ind) => {
                     return (
-                      <View key={ind} style={Styles.codCard}>
+                      <TouchableOpacity
+                        key={ind}
+                        style={Styles.codCard}
+                        onPress={() => navigate(`/order/${obj.order_id}`)}>
                         <View style={Styles.codLeftSection}>
                           <Text style={Styles.codName}>
                             {obj.company_name.substring(0, 1)}
@@ -407,7 +411,7 @@ const Statistics = () => {
                           </Text>
                           <Text>{getStatus(obj.order_status)}</Text>
                         </View>
-                      </View>
+                      </TouchableOpacity>
                     );
                   })}
                 </View>

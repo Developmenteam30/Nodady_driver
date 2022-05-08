@@ -43,6 +43,7 @@ const InputWithLabel = ({
               borderWidth: borderColor ? 1 : 0,
             }}
             keyboardType="number-pad"
+            editable={disabled}
             placeholder={placeholder}
           />
         </View>

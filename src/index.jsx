@@ -22,6 +22,16 @@ const Main = () => {
               />
               <Route
                 exact
+                path="/profile"
+                element={<NavigationRoutes.Profile />}
+              />
+              <Route
+                exact
+                path="/settings"
+                element={<NavigationRoutes.Settings />}
+              />
+              <Route
+                exact
                 path="/statistics"
                 element={<NavigationRoutes.Statistics />}
               />
@@ -47,8 +57,13 @@ const Main = () => {
               />
               <Route
                 exact
-                path="/reset-password"
-                element={<NavigationRoutes.ResetPassword />}
+                path="/forgot-password"
+                element={<NavigationRoutes.ForgotPassword />}
+              />
+              <Route
+                exact
+                path="/customer-support"
+                element={<NavigationRoutes.CustomerSupport />}
               />
               <Route
                 exact

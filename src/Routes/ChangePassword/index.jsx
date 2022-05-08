@@ -82,47 +82,11 @@ export default () => {
         message: 'Your passwords do not match.',
       });
     }
-    if (oldPassword.length < 8) {
-      return notification.setNotificationObject({
-        type: 'error',
-        message: 'Please enter password of min 8 digits',
-      });
-    }
-    if (oldPassword.search(/[a-z]/) < 0) {
-      return notification.setNotificationObject({
-        type: 'error',
-        message: 'Your password must contain at least one lowercase letter.',
-      });
-    }
-    if (oldPassword.search(/[A-Z]/) < 0) {
-      return notification.setNotificationObject({
-        type: 'error',
-        message: 'Your password must contain at least one uppercase letter.',
-      });
-    }
-    if (oldPassword.search(/[0-9]/) < 0) {
-      return notification.setNotificationObject({
-        type: 'error',
-        message: 'Your password must contain at least one digit.',
-      });
-    }
-    if (oldPassword.search(/[!@#$%^&*]/) < 0) {
-      return notification.setNotificationObject({
-        type: 'error',
-        message: 'Your password must contain at least special character.',
-      });
-    }
-    if (!(oldPassword.search(/[_]/) < 0)) {
-      return notification.setNotificationObject({
-        type: 'error',
-        message: 'Your password must not contain _.',
-      });
-    }
     session.setIsLoading(true);
     try {
       const token = await AsyncStorage.getItem('authData');
       const res = await axios.post(
-        `${API_DOMAIN}/api/v1/change-password`,
+        `${API_DOMAIN}/api/v1/change-password-internal-user`,
         {
           new_password: newPassword,
           confirm_password: confirmPassword,
@@ -131,7 +95,7 @@ export default () => {
         { headers: { authorization: `Bearer ${JSON.parse(token).token}` } },
       );
       if (res?.data) {
-        navigate('/account');
+        navigate('/settings');
         notification.setNotificationObject({
           type: 'success',
           message: 'Password changed successfully',

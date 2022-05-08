@@ -70,7 +70,6 @@ const SignIn = () => {
           }),
         );
         await AsyncStorage.setItem('loginData', JSON.stringify(res.data));
-        session.setProfileDetails(res.data);
         session.setIsLoading(false);
         navigate('/dashboard');
       }

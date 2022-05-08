@@ -15,20 +15,7 @@ export default props => {
   const [companyName, setCompanyName] = useState(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const [signUpDetails, setSignUpDetails] = useState(undefined);
-  const [profileDetails, setProfileDetails] = useState(undefined);
   const goPage = useRef(undefined);
-
-  useEffect(() => {
-    checkProfileDetails();
-  }, []);
-
-  const checkProfileDetails = async () => {
-    const jsonValue = await AsyncStorage.getItem('loginData');
-    if (jsonValue) {
-      const userInfo = jsonValue != null ? JSON.parse(jsonValue) : null;
-      setProfileDetails(userInfo);
-    }
-  };
 
   const checkPinCodeIsValid = async pincode => {
     try {
@@ -115,8 +102,6 @@ export default props => {
         setForwardOrderDetails,
         companyName,
         setCompanyName,
-        profileDetails,
-        setProfileDetails,
         goPage,
       }}>
       {isLoading && <Loader />}

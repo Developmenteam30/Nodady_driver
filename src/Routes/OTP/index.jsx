@@ -34,7 +34,7 @@ const OTP = ({ confirm }) => {
       );
       if (res?.data) {
         session.setIsLoading(false);
-        navigate('/reset-password');
+        navigate('/forgot-password');
       }
     } catch (error) {
       session.setIsLoading(false);
@@ -44,7 +44,7 @@ const OTP = ({ confirm }) => {
           Object.values(error.response.data)[0] &&
           Object.values(error.response.data)[0][0];
         if (firstError.toLowerCase() === 'phone number already exists.') {
-          navigate('/reset-password');
+          navigate('/forgot-password');
           return;
         }
         if (firstError) {
@@ -125,7 +125,7 @@ const OTP = ({ confirm }) => {
         );
         if (res?.data) {
           session.setIsLoading(false);
-          navigate('/reset-password');
+          navigate('/forgot-password');
         }
       } catch (error) {
         session.setIsLoading(false);
@@ -135,7 +135,7 @@ const OTP = ({ confirm }) => {
             Object.values(error.response.data)[0] &&
             Object.values(error.response.data)[0][0];
           if (firstError.toLowerCase() === 'phone number already exists.') {
-            navigate('/reset-password');
+            navigate('/forgot-password');
             return;
           }
           if (firstError) {

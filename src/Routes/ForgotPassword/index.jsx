@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { View, ScrollView, StatusBar } from 'react-native';
 import Button from '../../Components/Shared/Button';
-import Styles from './ResetPassword.styles';
+import Styles from './ForgotPassword.styles';
 import Constants from '../../Variables/colors.variables';
 import { useNavigate } from 'react-router-native';
 import Input from '../../Components/Shared/Input';

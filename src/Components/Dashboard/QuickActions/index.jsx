@@ -41,6 +41,15 @@ const QuickActions = () => {
           <Text style={Styles.actionText}>Statistics</Text>
         </TouchableOpacity>
       </View>
+      <View style={Styles.actionsSection}>
+        <TouchableOpacity
+          style={Styles.actionCardCustomer}
+          onPress={() => navigate('/customer-support')}>
+          <Image source={barcodeImg} style={Styles.actionImage} />
+          <Text style={Styles.actionText}>Customer Support</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={Styles.noCard}></TouchableOpacity>
+      </View>
     </View>
   );
 };

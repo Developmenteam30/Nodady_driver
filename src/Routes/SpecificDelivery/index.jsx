@@ -16,6 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_DOMAIN } from '../../Variables/globals.variables';
 import DownloadIcon from '../../Assets/Images/download.png';
 import RNFetchBlob from 'rn-fetch-blob';
+import ConfirmationModal from '../../Components/ConfirmationModal';
 
 const SpecificDelivery = () => {
   const params = useParams();
@@ -24,6 +25,8 @@ const SpecificDelivery = () => {
   const navigate = useNavigate();
   const [buttons, setButtons] = useState([]);
   const [apiCallMade, setApiCallMade] = useState(false);
+  const [cancelNote, setCancelNote] = useState('');
+  const [cancelModal, setCancelModal] = useState(false);
 
   useEffect(() => {
     getPickups();
@@ -75,10 +78,68 @@ const SpecificDelivery = () => {
     }
   };
 
+  const handleSubmit = async () => {
+    try {
+      session.setIsLoading(true);
+      const token = await AsyncStorage.getItem('authData');
+      if (!cancelNote) {
+        return notification.setNotificationObject({
+          type: 'error',
+          message: 'Please enter cancel note.',
+        });
+      }
+      const res = await axios.post(
+        `${API_DOMAIN}/api/v1/update-order`,
+        {
+          post_value: 'cancelled',
+          order_id: params.id,
+          cancel_note: cancelNote,
+        },
+        {
+          headers: {
+            authorization: `Bearer ${JSON.parse(token).token}`,
+          },
+        },
+      );
+      if (res?.data) {
+        setCancelModal(false);
+        getPickups();
+        session.setIsLoading(false);
+        return notification.setNotificationObject({
+          type: 'success',
+          message: 'Status Changed',
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      session.setIsLoading(false);
+      if (error.response) {
+        let firstError =
+          Object.values(error.response.data) &&
+          Object.values(error.response.data)[0] &&
+          Object.values(error.response.data)[0][0];
+        if (firstError) {
+          return notification.setNotificationObject({
+            type: 'error',
+            message: firstError,
+          });
+        }
+      }
+      return notification.setNotificationObject({
+        type: 'error',
+        message: error,
+      });
+    }
+  };
+
   const handleUpdate = async val => {
     try {
       if (val === 'completed') {
         navigate(`/otp-delivery/${params.id}`);
+        return;
+      }
+      if (val === 'cancelled') {
+        setCancelModal(true);
         return;
       }
       session.setIsLoading(true);
@@ -166,6 +227,18 @@ const SpecificDelivery = () => {
           <BreadCrumbs
             title={`Order ID: #${session.forwardOrderDetails.order_id}`}
           />
+          {cancelModal && (
+            <ConfirmationModal
+              hideCancelBtn
+              confirmButtonText={'DONE'}
+              handleConfirm={() => handleSubmit()}
+              text={'Why you want to cancel the order?'}
+              showInput
+              value={cancelNote}
+              onChange={setCancelNote}
+              handleClose={() => setCancelModal(false)}
+            />
+          )}
           <ScrollView keyboardShouldPersistTaps="handled">
             <View style={Styles.container}>
               <View style={Styles.cardSection}>
@@ -230,6 +303,18 @@ const SpecificDelivery = () => {
                     <Text style={Styles.subTitle}>
                       {session.forwardOrderDetails.delivery_address_line_1}{' '}
                       {session.forwardOrderDetails.delivery_address_line_2}
+                    </Text>
+                  </View>
+                </View>
+                <View
+                  style={{
+                    ...Styles.rowSection,
+                    marginTop: 16,
+                  }}>
+                  <View>
+                    <Text style={Styles.subText}>Pickup Phone Number</Text>
+                    <Text style={Styles.subTitle}>
+                      {session.forwardOrderDetails.pickup_phone_number}
                     </Text>
                   </View>
                 </View>

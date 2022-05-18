@@ -46,9 +46,9 @@ export default () => {
     session.setIsLoading(true);
     const token = await AsyncStorage.getItem('authData');
     let data = {
-      first_name: name.trim(),
-      last_name: lastName.trim(),
-      full_name: name.trim() + lastName.trim(),
+      first_name: name?.trim(),
+      last_name: lastName?.trim(),
+      full_name: name?.trim() + lastName?.trim(),
     };
     try {
       const res = await axios.post(

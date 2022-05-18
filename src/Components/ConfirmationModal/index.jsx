@@ -38,9 +38,10 @@ const ConfirmationModal = ({
           {showInput && (
             <View style={{ marginVertical: 8 }}>
               <Input
-                label="Share your feedback with us"
+                label="Cancel Note"
                 value={value}
                 onChange={onChange}
+                fullWidth
               />
             </View>
           )}

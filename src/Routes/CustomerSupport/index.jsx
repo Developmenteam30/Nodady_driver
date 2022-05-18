@@ -36,12 +36,13 @@ const SpecificDelivery = () => {
         },
       );
       if (res?.data?.detail) {
+        console.log(res.data);
         setData(res.data.detail);
         setApiCallMade(true);
         session.setIsLoading(false);
       }
     } catch (error) {
-      console.log(error);
+      console.log(error.response);
       session.setIsLoading(false);
       if (error.response) {
         let firstError =
@@ -123,7 +124,38 @@ const SpecificDelivery = () => {
                     </Text>
                   </View>
                 </View>
+                <View
+                  style={{
+                    ...Styles.rowSection,
+                    marginVertical: 16,
+                  }}>
+                  <View style={{ width: '50%' }}>
+                    <Text style={Styles.subText}>Customer Name</Text>
+                    <Text style={Styles.subTitle}>
+                      {data.customer_full_name}
+                    </Text>
+                  </View>
+                  <View style={{ width: '50%' }}>
+                    <Text style={Styles.subText}>Customer Phone Number</Text>
+                    <Text style={Styles.subTitle}>
+                      {data.customer_phone_number}
+                    </Text>
+                  </View>
+                </View>
+                <View
+                  style={{
+                    ...Styles.rowSection,
+                    marginVertical: 16,
+                  }}>
+                  <View style={{ width: '100%' }}>
+                    <Text style={Styles.subText}>Custmer Full Address</Text>
+                    <Text style={Styles.subTitle}>
+                      {data.customer_full_address}
+                    </Text>
+                  </View>
+                </View>
               </View>
+
               <View style={Styles.shipmentSection}>
                 <Text style={Styles.heading}>Rider Details</Text>
                 <View style={Styles.rowSection}>

@@ -41,6 +41,11 @@ const Styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     color: Constants.primaryColor,
   },
+  createdAt: {
+    fontSize: 11,
+    fontFamily: 'Poppins-Regular',
+    color: Constants.activeInputColor,
+  }
 });
 
 export default Styles;

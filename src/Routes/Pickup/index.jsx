@@ -14,6 +14,7 @@ import axios from 'axios';
 import { API_DOMAIN } from '../../Variables/globals.variables';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NotificationContext } from '../../Context/Notification.context';
+import moment from "moment";
 
 const Pickup = () => {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ const Pickup = () => {
         },
       });
       if (res?.data) {
+        console.log(res.data.detail, '123')
         setOrders(res.data.detail);
         setAllOrders(res.data.detail);
         session.setIsLoading(false);
@@ -89,6 +91,11 @@ const Pickup = () => {
                 <Text style={Styles.name}>{obj.business_owner}</Text>
                 <Text style={Styles.orderId}>Order Id</Text>
                 <Text style={Styles.orderIdNumber}>{obj.order_id}</Text>
+                <Text style={Styles.createdAt}>
+                  {moment(obj.created_at).format("DD-MM-YYYY ,  h:mm")}
+                  </Text>
+
+
               </TouchableOpacity>
             );
           })}

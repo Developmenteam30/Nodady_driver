@@ -17,6 +17,7 @@ import { API_DOMAIN } from '../../Variables/globals.variables';
 import DownloadIcon from '../../Assets/Images/download.png';
 import RNFetchBlob from 'rn-fetch-blob';
 import ConfirmationModal from '../../Components/ConfirmationModal';
+import moment from "moment";
 
 const SpecificDelivery = () => {
   const params = useParams();
@@ -387,9 +388,8 @@ const SpecificDelivery = () => {
                   <View style={{ width: '50%' }}>
                     <Text style={Styles.subText}>Order Created on</Text>
                     <Text style={Styles.subTitle}>
-                      {new Date(
-                        session.forwardOrderDetails.created_at,
-                      ).toLocaleDateString()}
+                      {moment(
+                        session.forwardOrderDetails.created_at).format('DD-MM-YYYY, hh:mm')}
                     </Text>
                   </View>
                   {/* <View style={{ width: '50%' }}>

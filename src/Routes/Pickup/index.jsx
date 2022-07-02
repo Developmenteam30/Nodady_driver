@@ -92,7 +92,7 @@ const Pickup = () => {
                 <Text style={Styles.orderId}>Order Id</Text>
                 <Text style={Styles.orderIdNumber}>{obj.order_id}</Text>
                 <Text style={Styles.createdAt}>
-                  {moment(obj.created_at).format("DD-MM-YYYY ,  h:mm")}
+                  {moment(obj.created_at).format("DD-MM-YYYY ,  hh:mm:ss")}
                   </Text>
 
 

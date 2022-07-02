@@ -94,7 +94,7 @@ const Delivery = () => {
                 </Text>
                 <Text style={Styles.orderId}>Order Id</Text>
                 <Text style={Styles.orderIdNumber}>{obj.order_id}</Text>
-                <Text style={Styles.createdAt}>{moment(obj.created_at).format('DD-MM-YYYY, hh:mm')}</Text>
+                <Text style={Styles.createdAt}>{moment(obj.created_at).format('DD-MM-YYYY, hh:mm:ss')}</Text>
 
               </TouchableOpacity>
             );

@@ -389,7 +389,7 @@ const SpecificDelivery = () => {
                     <Text style={Styles.subText}>Order Created on</Text>
                     <Text style={Styles.subTitle}>
                       {moment(
-                        session.forwardOrderDetails.created_at).format('DD-MM-YYYY, hh:mm')}
+                        session.forwardOrderDetails.created_at).format('DD-MM-YYYY, hh:mm:ss')}
                     </Text>
                   </View>
                   {/* <View style={{ width: '50%' }}>

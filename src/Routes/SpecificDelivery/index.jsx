@@ -8,6 +8,8 @@ import Constants from '../../Variables/colors.variables';
 import CodIcon from '../../Assets/Images/cod.png';
 import LocationIcon from '../../Assets/Images/location.png';
 import WeightIcon from '../../Assets/Images/weight.png';
+import DownArrow from '../../Assets/Images/Uparrow.png';
+
 import { useContext } from 'react';
 import { AppContext } from '../../Context/App.context';
 import { NotificationContext } from '../../Context/Notification.context';
@@ -48,6 +50,7 @@ const SpecificDelivery = () => {
       if (res?.data) {
         setButtons(res.data.detail.button);
         setApiCallMade(true);
+        console.log(res.data.detail, 'details')
         session.setForwardOrderDetails(res.data.detail);
         session.setIsLoading(false);
       }
@@ -243,9 +246,33 @@ const SpecificDelivery = () => {
           <ScrollView keyboardShouldPersistTaps="handled">
             <View style={Styles.container}>
               <View style={Styles.cardSection}>
-                <View style={Styles.card}>
+              <View style={Styles.card}>
                   <Image source={LocationIcon} />
-                  <Text style={{ ...Styles.subHeading, marginTop: 30 }}>
+                  <Text style={Styles.subHeading}>
+                    {session.forwardOrderDetails.pickup_state}
+                  </Text>
+                  <Text style={Styles.subText}>
+                    {session.forwardOrderDetails.pickup_pincode}
+                  </Text>
+                  <Image
+                    source={DownArrow}
+                    style={{
+                      transform: [{ rotate: '180deg' }],
+                      marginTop: 10,
+                      width: 16,
+                      height: 12,
+                    }}
+                  />
+                  <Image
+                    source={DownArrow}
+                    style={{
+                      transform: [{ rotate: '180deg' }],
+                      marginBottom: 10,
+                      width: 16,
+                      height: 12,
+                    }}
+                  />
+                  <Text style={Styles.subHeading}>
                     {session.forwardOrderDetails.delivery_state}
                   </Text>
                   <Text style={Styles.subText}>

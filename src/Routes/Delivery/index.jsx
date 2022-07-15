@@ -5,9 +5,11 @@ import {
   StatusBar,
   Text,
   TouchableOpacity,
+  FlatList,
+  BackHandler
 } from 'react-native';
 import Styles from './Delivery.styles';
-import { useNavigate } from 'react-router-native';
+import { useNavigate, useLocation } from 'react-router-native';
 import BreadCrumbs from '../../Components/Shared/BreadCrumbsWithSearch';
 import { AppContext } from '../../Context/App.context';
 import axios from 'axios';
@@ -18,16 +20,28 @@ import moment from "moment";
 
 const Delivery = () => {
   const navigate = useNavigate();
+  const queryParams = useLocation();
   const session = useContext(AppContext);
   const notification = useContext(NotificationContext);
   const [orders, setOrders] = useState([]);
   const [allOrders, setAllOrders] = useState([]);
   const [searchText, setSearchText] = useState(undefined);
+  const [apiCallDone, setApiCallDone] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+
 
   useEffect(() => {
     getPickups();
   }, []);
 
+  
+  useEffect(()=>{
+    BackHandler.removeEventListener('hardwareBackPress', backAction);
+  },[])
+  const backAction = async () => {
+    return false
+  }
   const getPickups = async () => {
     try {
       session.setIsLoading(true);
@@ -39,8 +53,13 @@ const Delivery = () => {
       });
       if (res?.data) {
         setOrders(res.data.detail);
+        if(queryParams.search && queryParams.search !=''){
+          const index= queryParams.search.replace('?','');
+          setCurrentIndex(index)
+          }
         setAllOrders(res.data.detail);
         session.setIsLoading(false);
+        setApiCallDone(true)
       }
     } catch (error) {
       session.setIsLoading(false);
@@ -66,6 +85,11 @@ const Delivery = () => {
   const handleFilter = () => {
     setOrders(allOrders.filter(obj => obj.order_id === searchText));
   };
+  const getItemLayout = (data, index) => ({
+    length: 140,
+    offset: 140 * index,
+    index,
+  })
 
   return (
     <>
@@ -75,32 +99,39 @@ const Delivery = () => {
         showSearchIcon
         value={searchText}
         onChange={setSearchText}
+        path=''
+        index={-1}
         handleSearch={() => {
           handleFilter();
         }}
       />
-      <ScrollView keyboardShouldPersistTaps="handled">
+       {apiCallDone && (
+        <>
         <View style={Styles.contentSection}>
-          {orders.map((obj, i) => {
-            return (
+        <FlatList
+                    data={orders}
+                    getItemLayout={getItemLayout}
+                    initialScrollIndex={currentIndex}
+                    renderItem={({ item, index }) => (
               <TouchableOpacity
-                key={i}
+                key={index}
                 style={Styles.card}
                 onPress={() => {
-                  navigate(`/order/${obj.id}`);
+                  navigate(`/order/${item.id}`,{state:{index:index, page:'delivery'}});
                 }}>
                 <Text style={Styles.name}>
-                  {obj.customer_first_name + ' ' + obj.customer_last_name}
+                  {item.customer_first_name + ' ' + item.customer_last_name}
                 </Text>
                 <Text style={Styles.orderId}>Order Id</Text>
-                <Text style={Styles.orderIdNumber}>{obj.order_id}</Text>
-                <Text style={Styles.createdAt}>{moment(obj.created_at).format('DD-MM-YYYY, hh:mm:ss')}</Text>
+                <Text style={Styles.orderIdNumber}>{item.order_id}</Text>
+                <Text style={Styles.createdAt}>{moment(item.created_at).format('DD-MM-YYYY, hh:mm:ss')}</Text>
 
               </TouchableOpacity>
-            );
-          })}
+            )}
+            />
         </View>
-      </ScrollView>
+        </>
+       )}
     </>
   );
 };

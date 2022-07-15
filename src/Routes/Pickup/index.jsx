@@ -5,9 +5,11 @@ import {
   StatusBar,
   Text,
   TouchableOpacity,
+  FlatList,
+  BackHandler
 } from 'react-native';
 import Styles from './Pickup.styles';
-import { useNavigate } from 'react-router-native';
+import { useNavigate, useLocation } from 'react-router-native';
 import BreadCrumbs from '../../Components/Shared/BreadCrumbsWithSearch';
 import { AppContext } from '../../Context/App.context';
 import axios from 'axios';
@@ -18,16 +20,29 @@ import moment from "moment";
 
 const Pickup = () => {
   const navigate = useNavigate();
+  const queryParams = useLocation();
   const session = useContext(AppContext);
   const notification = useContext(NotificationContext);
   const [orders, setOrders] = useState([]);
   const [allOrders, setAllOrders] = useState([]);
   const [searchText, setSearchText] = useState(undefined);
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [apiCallDone, setApiCallDone] = useState(false);
+
+
+
 
   useEffect(() => {
     getPickups();
-  }, []);
+    BackHandler.removeEventListener('hardwareBackPress');
 
+  }, []);
+  useEffect(()=>{
+    BackHandler.removeEventListener('hardwareBackPress', backAction);
+  },[])
+  const backAction = async () => {
+    return false
+  }
   const getPickups = async () => {
     try {
       session.setIsLoading(true);
@@ -38,10 +53,14 @@ const Pickup = () => {
         },
       });
       if (res?.data) {
-        console.log(res.data.detail, '123')
         setOrders(res.data.detail);
+        if(queryParams.search && queryParams.search !=''){
+          const index= queryParams.search.replace('?','');
+          setCurrentIndex(index)
+          }
         setAllOrders(res.data.detail);
         session.setIsLoading(false);
+        setApiCallDone(true)
       }
     } catch (error) {
       session.setIsLoading(false);
@@ -67,6 +86,11 @@ const Pickup = () => {
   const handleFilter = () => {
     setOrders(allOrders.filter(obj => obj.order_id === searchText));
   };
+  const getItemLayout = (data, index) => ({
+    length: 150,
+    offset: 150 * index,
+    index,
+  })
 
   return (
     <>
@@ -78,29 +102,36 @@ const Pickup = () => {
         onChange={setSearchText}
         handleSearch={() => handleFilter()}
       />
-      <ScrollView keyboardShouldPersistTaps="handled">
+      
+      {apiCallDone && (
+        <>
         <View style={Styles.contentSection}>
-          {orders.map((obj, i) => {
-            return (
+        <FlatList
+                    data={orders}
+                    getItemLayout={getItemLayout}
+                    initialScrollIndex={currentIndex}
+                    renderItem={({ item, index }) => (
               <TouchableOpacity
-                key={i}
+                key={index}
                 style={Styles.card}
                 onPress={() => {
-                  navigate(`/order/${obj.id}`);
+                  navigate(`/order/${item.id}`,{state:{index:index, page:'pickup'}});
                 }}>
-                <Text style={Styles.name}>{obj.business_owner}</Text>
+                <Text style={Styles.name}>{item.business_owner}</Text>
                 <Text style={Styles.orderId}>Order Id</Text>
-                <Text style={Styles.orderIdNumber}>{obj.order_id}</Text>
+                <Text style={Styles.orderIdNumber}>{item.order_id}</Text>
                 <Text style={Styles.createdAt}>
-                  {moment(obj.created_at).format("DD-MM-YYYY ,  hh:mm:ss")}
+                  {moment(item.created_at).format("DD-MM-YYYY ,  hh:mm:ss")}
                   </Text>
 
 
               </TouchableOpacity>
-            );
-          })}
+            )}
+            />
         </View>
-      </ScrollView>
+        </>
+      )}
+      {/* </ScrollView> */}
     </>
   );
 };

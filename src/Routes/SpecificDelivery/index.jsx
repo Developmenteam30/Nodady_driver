@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, Image, ScrollView, StatusBar } from 'react-native';
+import { Text, View, Image, ScrollView, StatusBar, BackHandler } from 'react-native';
 import BreadCrumbs from '../../Components/Shared/BreadCrumbs';
 import Styles from './SpecificDelivery.styles';
-import { useNavigate, useParams } from 'react-router-native';
+import { useNavigate, useParams, useLocation } from 'react-router-native';
 import Button from '../../Components/Shared/Button';
 import Constants from '../../Variables/colors.variables';
 import CodIcon from '../../Assets/Images/cod.png';
@@ -21,6 +21,7 @@ import RNFetchBlob from 'rn-fetch-blob';
 import ConfirmationModal from '../../Components/ConfirmationModal';
 import moment from "moment";
 
+
 const SpecificDelivery = () => {
   const params = useParams();
   const session = useContext(AppContext);
@@ -30,10 +31,47 @@ const SpecificDelivery = () => {
   const [apiCallMade, setApiCallMade] = useState(false);
   const [cancelNote, setCancelNote] = useState('');
   const [cancelModal, setCancelModal] = useState(false);
+  const { state } = useLocation();
+const [index, setIndex] = useState(-1);
+const [page,setPage]= useState('')
 
   useEffect(() => {
     getPickups();
+    if(state){
+      setIndex(state.index)
+      setPage(state.page)
+    }
   }, []);
+  useEffect(() => {
+    console.log('callin back')
+    if (!state || !session) {
+      return;
+    }
+    if(state && state.page =='delivery' || state && state.page =='pickup'){
+    const back =  BackHandler.addEventListener('hardwareBackPress', backAction);
+    return () =>
+      back.remove();
+    }else{
+      return
+    }
+  }, []);
+
+  const backAction = async () => {
+    console.log('back button call', state)
+    if (state && state.index>-1) {
+      navigate({
+        pathname:  '/'+ `${state.page}`,
+        search: `${state.index}`
+      })
+      console.log(state, 'stt')
+      return true;
+    } else {
+      // navigate(-1);
+      console.log(state, 'stt2')
+
+      return false;
+    }
+  };
 
   const getPickups = async () => {
     try {
@@ -50,7 +88,6 @@ const SpecificDelivery = () => {
       if (res?.data) {
         setButtons(res.data.detail.button);
         setApiCallMade(true);
-        console.log(res.data.detail, 'details')
         session.setForwardOrderDetails(res.data.detail);
         session.setIsLoading(false);
       }
@@ -229,6 +266,8 @@ const SpecificDelivery = () => {
         <>
           <StatusBar backgroundColor="white" barStyle="dark-content" />
           <BreadCrumbs
+            path={page=='delivery' ? '/delivery':'/pickup'}
+            index = {index}
             title={`Order ID: #${session.forwardOrderDetails.order_id}`}
           />
           {cancelModal && (

@@ -15,6 +15,8 @@ const BreadCrumbs = ({
   onPress,
   color,
   timerReset,
+  index,
+  path
 }) => {
   const navigate = useNavigate();
   const [timerCount, setTimer] = useState(60);
@@ -79,7 +81,45 @@ const BreadCrumbs = ({
             </View>
           ) : (
             <>
-              {title ? (
+             {title && index>-1 && path ? (
+             <View style={Styles.titleHeader}>
+             <TouchableOpacity
+               style={Styles.button}
+               onPress={() => {
+                 onPress ? onPress() : navigate({
+                  pathname: path,
+                  search: `${index}`
+                });
+                console.log('cc2')
+
+               }}>
+               <Image
+                 source={color ? WhiteLeftArrow : LeftArrow}
+                 style={Styles.leftArrow}
+               />
+             </TouchableOpacity>
+             <Text
+               style={{
+                 ...Styles.title,
+                 flex: 1,
+                 color: color ? color : Constants.headingColor,
+               }}>
+               {title}
+             </Text>
+             <TouchableOpacity
+               style={Styles.rightButton}
+               onPress={() => {
+                 onPress ? onPress() : navigate({
+                  pathname: path,
+                  search: `${index}`
+                });
+                console.log('cc')
+               }}>
+             </TouchableOpacity>
+           </View>
+          ) : (
+            <>
+              {title && (!index || index <0 ) && !path ? (
                 <View style={Styles.titleHeader}>
                   <TouchableOpacity
                     style={Styles.button}
@@ -117,6 +157,8 @@ const BreadCrumbs = ({
             </>
           )}
         </>
+      )}
+       </>
       )}
     </>
   );

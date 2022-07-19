@@ -37,10 +37,16 @@ const Delivery = () => {
 
   
   useEffect(()=>{
-    BackHandler.removeEventListener('hardwareBackPress', backAction);
-  },[])
+    if(!session){
+      return
+    }
+    const back = BackHandler.addEventListener('hardwareBackPress', backAction);
+    return () =>
+      back.remove();
+  },[session])
   const backAction = async () => {
-    return false
+    navigate('/dashboard')
+    return true
   }
   const getPickups = async () => {
     try {
@@ -91,6 +97,7 @@ const Delivery = () => {
     index,
   })
 
+
   return (
     <>
       <StatusBar backgroundColor="white" barStyle="dark-content" />
@@ -99,6 +106,9 @@ const Delivery = () => {
         showSearchIcon
         value={searchText}
         onChange={setSearchText}
+        onPress={()=>{
+          navigate('/dashboard');
+        }}
         path=''
         index={-1}
         handleSearch={() => {

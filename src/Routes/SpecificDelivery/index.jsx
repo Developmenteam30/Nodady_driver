@@ -43,33 +43,26 @@ const [page,setPage]= useState('')
     }
   }, []);
   useEffect(() => {
-    console.log('callin back')
-    if (!state || !session) {
-      return;
-    }
-    if(state && state.page =='delivery' || state && state.page =='pickup'){
-    const back =  BackHandler.addEventListener('hardwareBackPress', backAction);
-    return () =>
-      back.remove();
-    }else{
+    if(!session){
       return
     }
-  }, []);
+     const back = BackHandler.addEventListener('hardwareBackPress', backAction);
+    return () =>
+      back.remove();
 
-  const backAction = async () => {
-    console.log('back button call', state)
+  }, [session]);
+
+  const backAction = () => {
+
     if (state && state.index>-1) {
       navigate({
         pathname:  '/'+ `${state.page}`,
         search: `${state.index}`
       })
-      console.log(state, 'stt')
       return true;
     } else {
-      // navigate(-1);
-      console.log(state, 'stt2')
-
-      return false;
+      navigate('/dashboard');
+      return true;
     }
   };
 

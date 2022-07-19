@@ -113,7 +113,6 @@ const BreadCrumbs = ({
                   pathname: path,
                   search: `${index}`
                 });
-                console.log('cc')
                }}>
              </TouchableOpacity>
            </View>

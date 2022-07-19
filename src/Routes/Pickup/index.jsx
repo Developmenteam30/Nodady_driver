@@ -38,10 +38,16 @@ const Pickup = () => {
 
   }, []);
   useEffect(()=>{
-    BackHandler.removeEventListener('hardwareBackPress', backAction);
-  },[])
+    if(!session){
+      return
+    }
+    const back = BackHandler.addEventListener('hardwareBackPress', backAction);
+    return () =>
+      back.remove();
+  },[session])
   const backAction = async () => {
-    return false
+    navigate('/dashboard')
+    return true
   }
   const getPickups = async () => {
     try {
@@ -100,6 +106,9 @@ const Pickup = () => {
         showSearchIcon
         value={searchText}
         onChange={setSearchText}
+        onPress={()=>{
+          navigate('/dashboard');
+        }}
         handleSearch={() => handleFilter()}
       />
       
